@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+    <head>
+    <title>Maze</title>
+    </head>
+    <body>
+        <table id="grid"></table>
+        <div>
+            <label>Block Density:</label> <br>
+            <input type="range" id="block_rate" min="0" max="1" step="0.05"> <br>
+            <input type="button" onclick="generate()" value="Generate">
+            <input type="button" onclick="console.log(validMaze())" value="Validity Check">
+        </div>
+        
+    </body>
+    <script src="app.js"></script>
+</html>
+
+<style>
+    table{
+        border: 10px ridge gray;
+        background-color: darkgray;
+        margin-bottom: 1em;
+    }
+    td {
+        width: 6px;
+        height: 6px;
+    }
+</style>
