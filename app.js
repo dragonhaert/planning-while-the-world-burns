@@ -2,9 +2,9 @@ const size = 51
 const center = Math.floor(size/2)
 var block_rate = 0
 
-const wallColor = "BLACK"
-const openColor = "YELLOW"
-const starColor = "WHITE"
+const wallColor = "black"
+const openColor = "FFFF80"
+const starColor = "gold"
 
 const table = document.getElementById("grid")
 const maze = new Array(size)
@@ -93,35 +93,6 @@ function update_block_rate()
     block_rate =  slider.value
 }
 
-function pathExists(x1,y1,x2,y2)
-{
-    explored = []
-    target = maze[x2][y2]
-    if (!maze[x1][y1].open || !maze[x2][y2].open)
-    {
-        return false
-    }
-
-    q = maze[x1][y1].neighbors()
-
-    while (q.length)
-    {
-        curr = q.pop()
-        explored.push(curr)
-        if (curr == target)
-        {
-            return true;
-        }
-        curr.neighbors().forEach(n => {
-            if (n.open && explored.indexOf(n) == -1)
-            {
-                q.push(n)
-            }
-        });
-    }
-    return false
-}
-
 function shortestPathFrom(x,y)
 {
     if (x < 0 || x >= size || y < 0 || y >= size || !maze[x][y].open)
@@ -165,32 +136,32 @@ function shortestPathFrom(x,y)
     return dist
 }
 
-
-
 function validMaze()
 {
-    d = shortestPathFrom(center,center)
-    TL = d[0][0] < unreachable
-    colorPath(0,0,d,"orange")
-    TR = d[0][size-1] < unreachable
-    colorPath(0,50,d,"cyan")
-    BL = d[size-1][0] < unreachable
-    colorPath(50,0,d,"green")
-    BR = d[size-1][size-1] < unreachable
-    colorPath(50,50,d,"magenta")
-    
-    /*
-        TL = pathExists(0,0,center,center)
-        colorMap("RED")
-        BL = pathExists(size-1,0,center,center)
-        colorMap("GREEN")
-        TR = pathExists(0,size-1,center,center)
-        colorMap("CYAN")
-        BR = pathExists(size-1,size-1,center,center)
-        colorMap("MAGENTA")
-    */
+    c = shortestPathFrom(center,center)
+    TL = c[0][0] < unreachable
+    colorPath(0,0,c,"orange")
+    TR = c[0][size-1] < unreachable
+    colorPath(0,50,c,"cyan")
+    BL = c[size-1][0] < unreachable
+    colorPath(50,0,c,"green")
+    BR = c[size-1][size-1] < unreachable
+    colorPath(50,50,c,"magenta")
 
-    return TL && BL && TR && BR 
+    maze[center][center].open = false
+    a = shortestPathFrom(0,0)
+    maze[center][center].open = true
+    CC = a[50][50] < unreachable
+    //colorPath(50,50,a,"red")
+
+    colorPath(50,0,a,"blue")
+    colorPath(0,50,a,"lime")
+
+    b = shortestPathFrom(50,50)
+    colorPath(0,50,b,"purple")
+    colorPath(50,0,b,"maroon")
+    
+    return TL && BL && TR && BR && CC
 }
 
 function colorPath(x,y,dist,color = "WHITE")
@@ -203,11 +174,4 @@ function colorPath(x,y,dist,color = "WHITE")
             .sort((a,b) => dist[b.x][b.y]-dist[a.x][a.y])
             .pop()
     }
-}
-
-function colorMap(color = starColor)
-{
-    explored.forEach(e => {
-        cells[e.x][e.y].setAttribute("bgcolor",color)
-    });
 }
