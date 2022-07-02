@@ -175,7 +175,7 @@ function validMaze()
     TR = d[0][size-1] < unreachable
     colorPath(0,50,d,"cyan")
     BL = d[size-1][0] < unreachable
-    colorPath(0,50,d,"green")
+    colorPath(50,0,d,"green")
     BR = d[size-1][size-1] < unreachable
     colorPath(50,50,d,"magenta")
     
