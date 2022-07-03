@@ -1,14 +1,15 @@
 const size = 51
 const center = Math.floor(size/2)
-var block_rate = 0
+var block_rate = 0.3
 
-const wallColor = "black"
+const wallColor = "401500"
 const openColor = "FFFF80"
 const starColor = "gold"
 
 const table = document.getElementById("grid")
 const maze = new Array(size)
 const cells = new Array(size)
+var selected = []
 
 for (var i = 0; i < size; i++) {
     maze[i] = new Array(size)
@@ -16,12 +17,51 @@ for (var i = 0; i < size; i++) {
     table.insertRow(i)
     for (var j = 0; j < size; j++)
     {
-        maze[i][j] = new Point (i,j)
+        maze[i][j] = new Point (j,i)
         cells[i][j] = table.rows[i].insertCell(j)
+        cells[i][j].setAttribute("class","maze-cell")
+        cells[i][j].setAttribute("onclick","select(event)")
     }
 }
 
+generate()
 display()
+
+function select(event)
+{
+    var x = event.path[0].cellIndex
+    var y = event.path[1].rowIndex
+    console.log(x, y)
+    if (!maze[y][x].open)
+    {
+        console.log("blocked point")
+        return
+    }
+    event.target.setAttribute("bgcolor",starColor)
+    selected.push(maze[y][x])
+
+    if (selected.length == 2)
+    {
+        end = selected.pop()
+        start = selected.pop()
+
+        console.log("travelling from",start.x,start.y,"to",end.x,end.y)
+
+        path = shortestPathFrom(end.x,end.y)
+
+        if (path[start.x][start.y] != unreachable)
+        {
+            console.log("path found")
+            colorPath(start.x,start.y,path,"red")    
+        }
+        else
+        {
+            console.log("no path found")
+        }
+    }
+}
+
+
 
 function Point(x,y)
 {
@@ -35,10 +75,10 @@ function Point(x,y)
 
         neighbors = new Array()
         
-        if (x != 0) neighbors.push(maze[x-1][y])
-        if (y != 0) neighbors.push(maze[x][y-1])
-        if (x != size - 1) neighbors.push(maze[x+1][y])
-        if (y != size - 1) neighbors.push(maze[x][y+1])
+        if (x != 0) neighbors.push(maze[y][x-1])
+        if (y != 0) neighbors.push(maze[y-1][x])
+        if (x != size - 1) neighbors.push(maze[y][x+1])
+        if (y != size - 1) neighbors.push(maze[y+1][x])
         return neighbors
     }
 
@@ -52,8 +92,6 @@ function Point(x,y)
 
 function generate()
 {
-    update_block_rate()
-
     for (var i = 0; i < size; i++)
     {
         for (var j = 0; j < size; j++)
@@ -67,8 +105,8 @@ function generate()
     maze[size-1][size-1].open = true
     maze[center][center].open = true
 
+    selected = []
     display()
-    //console.log(validMaze())
 }
 
 function display()
@@ -89,20 +127,21 @@ function display()
 
 function update_block_rate()
 {
-    slider = document.getElementById("block_rate")
+    slider = document.getElementById("block_rate_input")
     block_rate =  slider.value
+    document.getElementById('block_rate_label').innerHTML = block_rate
 }
 
 function shortestPathFrom(x,y)
 {
-    if (x < 0 || x >= size || y < 0 || y >= size || !maze[x][y].open)
+    if (x < 0 || x >= size || y < 0 || y >= size || !maze[y][x].open)
     {
         console.error("invalid start point")
     }
 
     seen = []
     
-    pq = [maze[x][y]]
+    pq = [maze[y][x]]
     dist = new Array(size)
     unreachable = size**2+1
     for (var i = 0; i < size; i++) {
@@ -136,17 +175,30 @@ function shortestPathFrom(x,y)
     return dist
 }
 
+function colorPath(x,y,dist,color = "WHITE")
+{
+    p = maze[y][x]
+    while (dist[p.x][p.y] != size**2+1 && dist[p.x][p.y])
+    {
+        cells[p.y][p.x].setAttribute("bgcolor",color)
+        p = p.neighbors()
+            .sort((a,b) => dist[b.x][b.y]-dist[a.x][a.y])
+            .pop()
+    }
+    cells[p.y][p.x].setAttribute("bgcolor",color)
+}
+
 function validMaze()
 {
     c = shortestPathFrom(center,center)
     TL = c[0][0] < unreachable
-    colorPath(0,0,c,"orange")
+    //colorPath(0,0,c,"orange")
     TR = c[0][size-1] < unreachable
-    colorPath(0,50,c,"cyan")
+    //colorPath(0,50,c,"cyan")
     BL = c[size-1][0] < unreachable
-    colorPath(50,0,c,"green")
+    //colorPath(50,0,c,"green")
     BR = c[size-1][size-1] < unreachable
-    colorPath(50,50,c,"magenta")
+    //colorPath(50,50,c,"magenta")
 
     maze[center][center].open = false
     a = shortestPathFrom(0,0)
@@ -164,14 +216,6 @@ function validMaze()
     return TL && BL && TR && BR && CC
 }
 
-function colorPath(x,y,dist,color = "WHITE")
-{
-    p = maze[x][y]
-    while (dist[p.x][p.y] != size**2+1 && dist[p.x][p.y])
-    {
-        cells[p.x][p.y].setAttribute("bgcolor",color)
-        p = p.neighbors()
-            .sort((a,b) => dist[b.x][b.y]-dist[a.x][a.y])
-            .pop()
-    }
-}
+
+
+
