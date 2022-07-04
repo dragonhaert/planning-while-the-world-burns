@@ -45,18 +45,16 @@ function select(event)
         end = selected.pop()
         start = selected.pop()
 
-        console.log("travelling from",start.x,start.y,"to",end.x,end.y)
-
         path = shortestPathFrom(end.x,end.y)
 
         if (path[start.x][start.y] != unreachable)
         {
-            console.log("path found")
+            console.log("path found from",start.x,start.y,"to",end.x,end.y)
             colorPath(start.x,start.y,path,"red")    
         }
         else
         {
-            console.log("no path found")
+            console.log("no path found from",start.x,start.y,"to",end.x,end.y)
         }
     }
 }
@@ -129,7 +127,7 @@ function update_block_rate()
 {
     slider = document.getElementById("block_rate_input")
     block_rate =  slider.value
-    document.getElementById('block_rate_label').innerHTML = block_rate
+    document.getElementById('block_rate_label').innerHTML = String(block_rate)+'\t' 
 }
 
 function shortestPathFrom(x,y)
@@ -200,17 +198,24 @@ function validMaze()
     a = shortestPathFrom(0,0)
     maze[center][center].open = true
     CC = a[size - 1][size - 1] < unreachable
+    
+    valid = TL && BL && TR && BR && CC
 
-    
-    colorPath(size - 1,size - 1,a,"light-blue")
-    colorPath(0,0,c,"orange")
-    colorPath(0,size - 1,c,"cyan")
-    colorPath(size - 1,0,c,"green")
-    colorPath(size - 1,size - 1,c,"magenta")
-    
-    return TL && BL && TR && BR && CC
+    document.getElementById("valid_maze_label").innerHTML = valid
+
+    return valid
 }
 
-
+function colorValid()
+{
+    c = shortestPathFrom(center,center)
+    a = shortestPathFrom(0,0)
+    
+    colorPath(0,0,c,"orange")
+    colorPath(size - 1,0,c,"green")
+    colorPath(0,size - 1,c,"cyan")
+    colorPath(size - 1,size - 1,c,"magenta")
+    colorPath(size - 1,size - 1,a,"light-blue")
+}
 
 

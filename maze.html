@@ -3,33 +3,51 @@
     <head>
         <title>Maze</title>
         <link rel="icon" href="icon0.png">
+        <script src="app.js"></script>
     </head>
     <body>
         <table id="grid"></table>
+        
         <table>
             <tr>
                 <td>
-                    <label>Block Density: <label id="block_rate_label">0.3</label></label>
+                    <input type="button" onclick="generate()" value="Generate" id="generate_button">
                 </td>
                 <td>
                     <input type="range" id="block_rate_input" min="0" max="0.6" step="0.03" onclick="update_block_rate()">
                 </td>
                 <td>
-                    <input type="button" onclick="generate()" value="Generate" id="generate_button">
+                    <label id="block_rate_label">0.30</label>
                 </td>
             </tr>
             <tr>
-
+                <td>
+                    <input type="button" onclick="validMaze()" value="Check Validity" id="valid_maze_button">
+                </td>
+                <td></td>
+                <td>
+                    <label id="valid_maze_label"></label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="button" onclick="colorValid()" value="Color Paths">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="button" onclick="display()" value="Clear Paths">
+                </td>
             </tr>
         </table>
         
     </body>
-    <script src="app.js"></script>
 </html>
 
 <style>
     body {
         margin: 1em;
+        display: inline;
     }
     #grid{
         border: 20px groove darkslategrey;
