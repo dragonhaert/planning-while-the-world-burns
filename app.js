@@ -192,26 +192,21 @@ function validMaze()
 {
     c = shortestPathFrom(center,center)
     TL = c[0][0] < unreachable
-    //colorPath(0,0,c,"orange")
     TR = c[0][size-1] < unreachable
-    //colorPath(0,50,c,"cyan")
     BL = c[size-1][0] < unreachable
-    //colorPath(50,0,c,"green")
     BR = c[size-1][size-1] < unreachable
-    //colorPath(50,50,c,"magenta")
 
     maze[center][center].open = false
     a = shortestPathFrom(0,0)
     maze[center][center].open = true
-    CC = a[50][50] < unreachable
-    //colorPath(50,50,a,"red")
+    CC = a[size - 1][size - 1] < unreachable
 
-    colorPath(50,0,a,"blue")
-    colorPath(0,50,a,"lime")
-
-    b = shortestPathFrom(50,50)
-    colorPath(0,50,b,"purple")
-    colorPath(50,0,b,"maroon")
+    
+    colorPath(size - 1,size - 1,a,"light-blue")
+    colorPath(0,0,c,"orange")
+    colorPath(0,size - 1,c,"cyan")
+    colorPath(size - 1,0,c,"green")
+    colorPath(size - 1,size - 1,c,"magenta")
     
     return TL && BL && TR && BR && CC
 }
