@@ -6,34 +6,21 @@
     </head>
     <body>
         <table id="grid"></table>
-        <input type="button" onclick="generate()" value="Generate" id="generate_button">
-        <input type="range" id="block_rate_input" min="0" max="0.6" step="0.03" onclick="update_block_rate()">
-        <label id="block_rate_label">0.30</label>
-        <table>
-            <tr>
-                <td>
-                    <input type="button" onclick="validMaze()" value="Check Validity" id="valid_maze_button">
-                </td>
-                <td></td>
-                <td>
-                    <label id="valid_maze_label"></label>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="button" onclick="colorValid()" value="Paint Valid">
-                </td>
-                <td>
-                    <input type="button" onclick="display()" value="Clear Paths">
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="color" id="color_picker">
-                </td>
-            </tr>
-        </table>
-        
+        <div>
+            <input type="button" onclick="generate()" value="Generate" id="generate_button">
+            <input type="range" id="block_rate_input" min="0" max="0.6" step="0.03" onclick="update_block_rate()">
+            <label id="block_rate_label">0.30</label>
+        </div>
+        <div>
+            <input type="button" onclick="colorValid()" value="Paint Valid">
+            <input type="button" onclick="validMaze()" value="Check Validity" id="valid_maze_button">
+            <label id="valid_maze_label"></label>
+        </div>
+        <div>
+            <input type="color" id="color_picker" value="#e94949">
+            <input type="button" onclick="display()" value="Clear Paths">
+        </div>
+       
     </body>
     <script src="app.js"></script>
 </html>
@@ -41,6 +28,7 @@
 <style>
     body {
         margin: 1em;
+        border-spacing: 5px;
     }
     #grid{
         border: 20px groove darkslategrey;
