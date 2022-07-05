@@ -9,6 +9,7 @@ const starColor = "gold"
 const table = document.getElementById("grid")
 const maze = new Array(size)
 const cells = new Array(size)
+
 var selected = []
 
 for (var i = 0; i < size; i++) {
@@ -31,12 +32,13 @@ function select(event)
 {
     var x = event.path[0].cellIndex
     var y = event.path[1].rowIndex
-    console.log(x, y)
+
     if (!maze[y][x].open)
     {
         console.log("blocked point")
         return
     }
+
     event.target.setAttribute("bgcolor",starColor)
     selected.push(maze[y][x])
 
@@ -50,22 +52,22 @@ function select(event)
         if (path[start.x][start.y] != unreachable)
         {
             console.log("path found from",start.x,start.y,"to",end.x,end.y)
-            colorPath(start.x,start.y,path,"red")    
+
+            customColor = document.getElementById("color_picker").value
+            colorPath(start.x,start.y,path,customColor)
         }
         else
         {
-            console.log("no path found from",start.x,start.y,"to",end.x,end.y)
+            console.log("no path from",start.x,start.y,"to",end.x,end.y)
         }
     }
 }
 
-
-
 function Point(x,y)
 {
-    this.x = x;
+    this.x = x
     this.y = y
-    this.open = Math.random() > block_rate;
+    this.open = Math.random() > block_rate
 
     this.neighbors = function ()
     {
@@ -116,10 +118,6 @@ function display()
             cells[i][j].setAttribute("bgcolor", maze[i][j].open ? openColor : wallColor)
         }
     }
-    cells[0][0].setAttribute("bgcolor",starColor)
-    cells[0][size-1].setAttribute("bgcolor",starColor)
-    cells[size-1][0].setAttribute("bgcolor",starColor)
-    cells[size-1][size-1].setAttribute("bgcolor",starColor)
     cells[center][center].setAttribute("bgcolor",starColor)
 }
 

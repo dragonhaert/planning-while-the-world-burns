@@ -6,19 +6,10 @@
     </head>
     <body>
         <table id="grid"></table>
-        
+        <input type="button" onclick="generate()" value="Generate" id="generate_button">
+        <input type="range" id="block_rate_input" min="0" max="0.6" step="0.03" onclick="update_block_rate()">
+        <label id="block_rate_label">0.30</label>
         <table>
-            <tr>
-                <td>
-                    <input type="button" onclick="generate()" value="Generate" id="generate_button">
-                </td>
-                <td>
-                    <input type="range" id="block_rate_input" min="0" max="0.6" step="0.03" onclick="update_block_rate()">
-                </td>
-                <td>
-                    <label id="block_rate_label">0.30</label>
-                </td>
-            </tr>
             <tr>
                 <td>
                     <input type="button" onclick="validMaze()" value="Check Validity" id="valid_maze_button">
@@ -30,12 +21,15 @@
             </tr>
             <tr>
                 <td>
-                    <input type="button" onclick="colorValid()" value="Color Paths">
+                    <input type="button" onclick="colorValid()" value="Paint Valid">
+                </td>
+                <td>
+                    <input type="button" onclick="display()" value="Clear Paths">
                 </td>
             </tr>
             <tr>
                 <td>
-                    <input type="button" onclick="display()" value="Clear Paths">
+                    <input type="color" id="color_picker">
                 </td>
             </tr>
         </table>
@@ -47,7 +41,6 @@
 <style>
     body {
         margin: 1em;
-        display: inline;
     }
     #grid{
         border: 20px groove darkslategrey;
