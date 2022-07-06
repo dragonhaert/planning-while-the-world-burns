@@ -5,7 +5,9 @@
         <link rel="icon" href="icon0.png">
     </head>
     <body>
-        <table id="grid"></table>
+        <div>
+            <table id="grid"></table>
+        </div>
         <div>
             <input type="button" onclick="generate()" value="Generate" id="generate_button">
             <input type="range" id="block_rate_input" min="0" max="0.6" step="0.03" onclick="update_block_rate()">
@@ -26,14 +28,12 @@
 </html>
 
 <style>
-    body {
+    div {
         margin: 1em;
-        border-spacing: 5px;
     }
     #grid{
         border: 20px groove darkslategrey;
         background-color: darkgray;
-        margin: 1em;
         border-spacing: 0;
     }
     .maze-cell {
