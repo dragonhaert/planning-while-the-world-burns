@@ -12,7 +12,8 @@ const cells = new Array(size)
 
 var selected = []
 
-for (var i = 0; i < size; i++) {
+for (var i = 0; i < size; i++)
+{
     maze[i] = new Array(size)
     cells[i] = new Array(size)
     table.insertRow(i)
@@ -147,7 +148,7 @@ function shortestPathFrom(x,y)
             dist[i][j] = unreachable
         }
     }
-    dist[x][y] = 0;
+    dist[y][x] = 0;
 
     while(pq.length)
     {
@@ -157,7 +158,7 @@ function shortestPathFrom(x,y)
         curr.neighbors().forEach(n => {
             if (n.open)
             {
-                dist[n.x][n.y] = Math.min(dist[n.x][n.y],dist[curr.x][curr.y]+1)
+                dist[n.y][n.x] = Math.min(dist[n.y][n.x],dist[curr.y][curr.x]+1)
                 if (seen.indexOf(n) == -1 && pq.indexOf(n) == -1)
                 {
                     pq.push(n)
@@ -165,20 +166,20 @@ function shortestPathFrom(x,y)
             }
         });
 
-        pq.sort((b,a) => dist[a.x][a.y]-dist[b.x][b.y])
+        pq.sort((b,a) => dist[a.y][a.x]-dist[b.y][b.x])
     }
 
     return dist
 }
 
-function colorPath(x,y,dist,color = "WHITE")
+function colorPath(x,y,dist,color)
 {
     p = maze[y][x]
-    while (dist[p.x][p.y] != size**2+1 && dist[p.x][p.y])
+    while (dist[p.y][p.x] != size**2+1 && dist[p.y][p.x])
     {
         cells[p.y][p.x].setAttribute("bgcolor",color)
         p = p.neighbors()
-            .sort((a,b) => dist[b.x][b.y]-dist[a.x][a.y])
+            .sort((a,b) => dist[b.y][b.x]-dist[a.y][a.x])
             .pop()
     }
     cells[p.y][p.x].setAttribute("bgcolor",color)
