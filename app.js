@@ -1,10 +1,12 @@
 const size = 51
 const center = Math.floor(size/2)
 var block_rate = 0.3
+const unreachable = size**2+1
 
 const wallColor = "401500"
 const openColor = "FFFF80"
 const starColor = "gold"
+
 
 const table = document.getElementById("grid")
 const maze = new Array(size)
@@ -140,7 +142,6 @@ function shortestPathFrom(x,y)
     
     pq = [maze[y][x]]
     dist = new Array(size)
-    unreachable = size**2+1
     for (var i = 0; i < size; i++) {
         dist[i] = new Array(size)
         for (var j = 0; j < size; j++)
@@ -175,7 +176,7 @@ function shortestPathFrom(x,y)
 function colorPath(x,y,dist,color)
 {
     p = maze[y][x]
-    while (dist[p.y][p.x] != size**2+1 && dist[p.y][p.x])
+    while (dist[p.y][p.x] != unreachable && dist[p.y][p.x])
     {
         cells[p.y][p.x].setAttribute("bgcolor",color)
         p = p.neighbors()
@@ -217,4 +218,25 @@ function colorValid()
     colorPath(size - 1,size - 1,a,"light-blue")
 }
 
+function getPath(x,y,dist)
+{
+    if (dist[y][x] == unreachable)
+    {
+        return []
+    }
+    path = []
+    p = maze[y][x]
+    while (dist[p.y][p.x] != unreachable && dist[p.y][p.x])
+    {
+        path.push(p)
+        p = p.neighbors()
+            .sort((a,b) => dist[b.y][b.x]-dist[a.y][a.x])
+            .pop()
+    }
+    return path
+}
 
+function setFire(x,y)
+{
+
+}
