@@ -52,7 +52,7 @@ function select(event)
 
         path = shortestPathFrom(end.x,end.y)
 
-        if (path[start.x][start.y] != unreachable)
+        if (path[start.y][start.x] != unreachable)
         {
             console.log("path found from",start.x,start.y,"to",end.x,end.y)
 
