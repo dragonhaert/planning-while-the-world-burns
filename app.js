@@ -1,7 +1,7 @@
 const size = 51
 const center = Math.floor(size/2)
-var block_rate = 0.3
 const unreachable = size**2+1
+var block_rate = 0.3
 
 const wallColor = "401500"
 const openColor = "FFFF80"
@@ -11,6 +11,7 @@ const starColor = "gold"
 const table = document.getElementById("grid")
 const maze = new Array(size)
 const cells = new Array(size)
+
 
 var selected = []
 
@@ -109,6 +110,8 @@ function generate()
     maze[center][center].open = true
 
     selected = []
+    
+    validMaze()
     display()
 }
 
@@ -211,11 +214,11 @@ function colorValid()
     c = shortestPathFrom(center,center)
     a = shortestPathFrom(0,0)
     
-    colorPath(0,0,c,"orange")
-    colorPath(size - 1,0,c,"green")
-    colorPath(0,size - 1,c,"cyan")
-    colorPath(size - 1,size - 1,c,"magenta")
-    colorPath(size - 1,size - 1,a,"light-blue")
+    colorPath(0,0,c,"#e94949")
+    colorPath(size - 1,0,c,"#e9ae49")
+    colorPath(0,size - 1,c,"#b4e949")
+    colorPath(size - 1,size - 1,c,"#49e994")
+    colorPath(size - 1,size - 1,a,"#7e49e9")
 }
 
 function getPath(x,y,dist)
@@ -236,7 +239,17 @@ function getPath(x,y,dist)
     return path
 }
 
-function setFire(x,y)
+function generateValidMaze()
 {
+    generate()
+    tries = 0
+    limit = 9999
+    while(!validMaze() && tries < limit)
+    {
+        tries++
+        generate()
+    }
+    return tries != limit
 
 }
+
