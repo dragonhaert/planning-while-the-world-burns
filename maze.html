@@ -14,29 +14,37 @@
             <label id="block_rate_label">0.30</label>
         </div>
         <div>
+            <div>
+                <b>Validity: </b><label id="valid_maze_label"></label>
+            </div>
             <input type="button" onclick="generateValidMaze()" value="Generate Valid">
             <input type="button" onclick="colorValid()" value="Paint Valid">
-            <label id="valid_maze_label"></label>
+            
         </div>
         <div>
-            <input type="color" id="color_picker" value="#e94949">
             <input type="button" onclick="display()" value="Clear Paths">
+            <input type="color" id="color_picker" value="#e94949">
         </div>
-       
+       <div>
+            <input type="button" onclick="spreadFire()" value="Step">
+       </div>
     </body>
     <script src="app.js"></script>
 </html>
 
 <style>
-    div {
-        margin: 1em;
+    body {
+        padding: 1em;
     }
-    #grid{
+    body > div{
+        margin-bottom: 1em;
+    }
+    table#grid{
         border: 20px groove darkslategrey;
         background-color: darkgray;
         border-spacing: 0;
     }
-    .maze-cell {
+    td.maze {
         width: 8px;
         height: 8px;
     }
