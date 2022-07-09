@@ -6,6 +6,7 @@ var block_rate = 0.3
 const wallColor = "401500"
 const openColor = "FFFF80"
 const starColor = "gold"
+const fireColor = "red"
 
 
 const table = document.getElementById("grid")
@@ -13,7 +14,7 @@ const maze = new Array(size)
 const cells = new Array(size)
 
 var fireField = []
-var fireSpread = 0.5
+var flammability = 0.5
 
 var selected = []
 
@@ -43,16 +44,16 @@ function Point(x,y)
     this.open = Math.random() > block_rate
     this.onFire = false
 
-    this.neighbors = function ()
+    this.neighbors = function (state = maze)
     {
         if (x < 0 || y < 0 || x >= size || y >= size ) return []
 
         neighbors = new Array()
         
-        if (x != 0) neighbors.push(maze[y][x-1])
-        if (y != 0) neighbors.push(maze[y-1][x])
-        if (x != size - 1) neighbors.push(maze[y][x+1])
-        if (y != size - 1) neighbors.push(maze[y+1][x])
+        if (x != 0) neighbors.push(state[y][x-1])
+        if (y != 0) neighbors.push(state[y-1][x])
+        if (x != size - 1) neighbors.push(state[y][x+1])
+        if (y != size - 1) neighbors.push(state[y+1][x])
         return neighbors
     }
 
@@ -88,16 +89,28 @@ function generate()
     display()
 }
 
-function display()
+function display(state=maze)
 {
     for (var i = 0; i < size; i++)
     {
         for (var j = 0; j < size; j++)
         {
-            cells[i][j].setAttribute("bgcolor", maze[i][j].open ? (maze[i][j].onFire ? "red" : openColor) : wallColor)
+            cells[i][j].setAttribute("bgcolor", state[i][j].open ? (state[i][j].onFire ? fireColor : openColor) : wallColor)
         }
     }
     cells[center][center].setAttribute("bgcolor",starColor)
+}
+
+function clearAll(){
+    maze.forEach(row =>{
+        row.forEach(c => {
+            c.onFire = false
+        })
+    })
+    maze[center][center].onFire = true
+    fireField = [maze[center][center]]
+    selected = []
+    display()
 }
 
 function update_block_rate()
@@ -107,9 +120,15 @@ function update_block_rate()
     document.getElementById('block_rate_label').innerHTML = String(block_rate)+'\t' 
 }
 
-function shortestPathFrom(x,y,state=maze)
+function update_flammability()
 {
-    if (x < 0 || x >= size || y < 0 || y >= size || !state[y][x].open)
+    slider = document.getElementById("fire_spread_rate")
+    flammability = slider.value
+}
+
+function shortestPathFrom(x,y,state=maze,avoidFire=false)
+{
+    if (x < 0 || x >= size || y < 0 || y >= size)
     {
         console.error("invalid start point")
     }
@@ -125,6 +144,10 @@ function shortestPathFrom(x,y,state=maze)
             dist[i][j] = unreachable
         }
     }
+    if (!state[y][x].open || (avoidFire && state[y][x].onFire))
+    {
+        return dist
+    }
     dist[y][x] = 0;
 
     while(pq.length)
@@ -133,7 +156,7 @@ function shortestPathFrom(x,y,state=maze)
         seen.push(curr)
         
         curr.neighbors().forEach(n => {
-            if (n.open)
+            if (n.open && (!avoidFire || !state[n.y][n.x].onFire))
             {
                 dist[n.y][n.x] = Math.min(dist[n.y][n.x],dist[curr.y][curr.x]+1)
                 if (seen.indexOf(n) == -1 && pq.indexOf(n) == -1)
@@ -176,7 +199,7 @@ function select(event)
         end = selected.pop()
         start = selected.pop()
 
-        path = shortestPathFrom(end.x,end.y)
+        path = shortestPathFrom(end.x,end.y,maze,true)
 
         if (path[start.y][start.x] != unreachable)
         {
@@ -267,18 +290,48 @@ function pathOnFire(path)
     return false
 }
 
-function spreadFire(fire=fireField)
+function spreadFire()
 {
-    stage = fire
-    .filter(spark => spark.neighbors().filter(n => n.open && !n.onFire).length)
+    stage = fireField.filter(spark => spark.neighbors().filter(n => n.open && !n.onFire).length)
     toLight = []
     safe = []
     stage.forEach(edge => {
         edge.neighbors()
         .filter(n => n.open && !n.onFire && toLight.indexOf(n) == -1)
         .forEach(fringe => {
-                burningNeighbors = fringe.neighbors().filter(n => n.onFire).length
-                threshold = 1 - (1 - fireSpread)**burningNeighbors
+            burningNeighbors = fringe.neighbors().filter(n => n.onFire).length
+            threshold = 1 - (1 - flammability)**burningNeighbors
+            if (Math.random() < threshold) 
+            {
+                toLight.push(fringe)
+            }
+            else
+            {
+                safe.push(fringe)
+            }
+        })
+    });
+
+    toLight.forEach(kindle => {
+        kindle.onFire = true;
+        fireField.push(kindle)
+        cells[kindle.y][kindle.x].setAttribute("bgcolor",fireColor)
+    })
+}
+
+function agent3(x=0,y=0,dx=size-1,dy=size-1)
+{
+    function projectSpread(fire,state)
+    {
+        stage = projectedFire.filter(spark => spark.neighbors(state).filter(n => n.open && !n.onFire).length)
+        toLight = []
+        safe = []
+        stage.forEach(edge => {
+            edge.neighbors(state)
+            .filter(n => n.open && !n.onFire && toLight.indexOf(n) == -1)
+            .forEach(fringe => {
+                burningNeighbors = fringe.neighbors(state).filter(n => n.onFire).length
+                threshold = 1 - (1 - flammability)**burningNeighbors
                 if (Math.random() < threshold) 
                 {
                     toLight.push(fringe)
@@ -287,13 +340,40 @@ function spreadFire(fire=fireField)
                 {
                     safe.push(fringe)
                 }
+            })
+        });
+
+        toLight.forEach(kindle => {
+            kindle.onFire = true;
+            fire.push(kindle)
+            cells[kindle.y][kindle.x].setAttribute("bgcolor",fireColor)
         })
-    });
+    }
+    projectedState = new Array(size)
+    projectedFire = []
 
-    toLight.forEach(kindle => {
-        kindle.onFire = true;
-        fire.push(kindle)
-    })
+    for (var i = 0; i < size; i++) {
+        projectedState[i] = new Array(size)
+        for (var j = 0; j < size; j++)
+        {
+            ref = maze[i][j]
+            projectedState[i][j] = new Point(ref.x,ref.y)
+            projectedState[i][j].open = ref.open
+            if (ref.onFire)
+            {
+                projectedState[i][j].onFire = true
+                projectedFire.push(projectedState[i][j])
+            }
+        }
+    }
+
+    projectSpread(projectedFire,projectedState)
+    projectSpread(projectedFire,projectedState)
+    projectSpread(projectedFire,projectedState)
+    
+    a = shortestPathFrom(dx,dy,projectedState,true)
+
     display()
+    colorPath(0,0,a,"blue")
+    return getPath(x,y,a,projectedState)
 }
-

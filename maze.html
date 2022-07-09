@@ -11,22 +11,32 @@
         <div>
             <input type="button" onclick="generate()" value="Generate Random" id="generate_button">
             <input type="range" id="block_rate_input" min="0" max="0.5" step="0.02" onclick="update_block_rate()">
+            Density:
             <label id="block_rate_label">0.30</label>
         </div>
         <div>
-            <div>
-                <b>Validity: </b><label id="valid_maze_label"></label>
-            </div>
             <input type="button" onclick="generateValidMaze()" value="Generate Valid">
             <input type="button" onclick="colorValid()" value="Paint Valid">
-            
-        </div>
-        <div>
-            <input type="button" onclick="display()" value="Clear Paths">
-            <input type="color" id="color_picker" value="#e94949">
+            Validity:
+            <label id="valid_maze_label"></label>
         </div>
        <div>
             <input type="button" onclick="spreadFire()" value="Step">
+            <input type="range" id="fire_spread_rate" min="0" max="1" step="0.02" onclick="update_flammability()">
+       </div>
+       <div>
+        <input type="button" onclick="agent3()" value="Test Agent 3">
+       </div>
+
+
+
+       <div>
+           <input type="button" onclick="clearAll()" value="Clear All">
+           <input type="button" onclick="display()" value="Clear Paths">
+       </div>
+       <div>
+        Custom Path Color: 
+        <input type="color" id="color_picker" value="#e94949">
        </div>
     </body>
     <script src="app.js"></script>
@@ -37,7 +47,7 @@
         padding: 1em;
     }
     body > div{
-        margin-bottom: 1em;
+        margin-bottom: 5px;
     }
     table#grid{
         border: 20px groove darkslategrey;
