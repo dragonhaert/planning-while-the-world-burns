@@ -9,29 +9,32 @@
             <table id="grid"></table>
         </div>
         <div>
-            <input type="button" onclick="generate()" value="Generate Random" id="generate_button">
-            <input type="range" id="block_rate_input" min="0" max="1" step="0.02" onclick="update_block_rate()">
-            Density:
-            <label id="block_rate_label">0.30</label>
-        </div>
-        <div>
+            <input type="button" onclick="generate()" value="Generate Random">
             <input type="button" onclick="generateValidMaze()" value="Generate Valid">
-            <input type="button" onclick="colorValid()" value="Paint Valid">
             Validity:
             <label id="valid_maze_label"></label>
         </div>
        <div>
+            <input type="button" onclick="fullSimulation()" value="Simulate">   
             <input type="button" onclick="simulationStep()" value="Step">
-            <input type="range" id="fire_spread_rate" min="0" max="1" step="0.02" value="0.2" onclick="update_flammability()">
+            <input type="button" onclick="clearAll()" value="Reset">
+            Iterations: <input type="number" id="iteration_input" min="0" value="1" onchange="update_iterations()">
        </div>
        <div>
-           <input type="button" onclick="clearAll()" value="Reset">
-           <input type="button" onclick="display()" value="Clear Paths">
+            <input type="range" id="flammability_input" min="0" max="1" step="0.02" value="0.2" onchange="update_flammability()">
+            Q / Flammability: <label id="flammability_label">0.20</label>
+        </div>
+        <div>
+            <input type="range" id="block_rate_input" min="0" max="1" step="0.02" onchange="update_block_rate()">
+            Density: <label id="block_rate_label">0.30</label>
        </div>
        <div>
-        Custom Path Color: 
-        <input type="color" id="color_picker" value="#e94949">
+            Custom Path Color: <input type="color" id="color_picker" value="#e94949">
        </div>
+        <div>
+            <input type="button" onclick="colorValid()" value="Paint Valid">
+            <input type="button" onclick="display()" value="Clear Paths">
+        </div>
     </body>
     <script src="app.js"></script>
 </html>
@@ -53,4 +56,7 @@
         height: 8px;
     }
 
+    input[type=number] {
+        width: 4em;
+    }
 </style>

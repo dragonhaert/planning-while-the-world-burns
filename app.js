@@ -16,6 +16,7 @@ var selected = []
 var time = 0
 var fireField = []
 var flammability = 0.2
+var iterations = 1
 
 const agent1 = {
     playing: true,
@@ -204,15 +205,22 @@ function clearAll(){
 
 function update_block_rate()
 {
-    slider = document.getElementById("block_rate_input")
-    block_rate =  slider.value
+    input = document.getElementById("block_rate_input")
+    block_rate =  input.value
     document.getElementById('block_rate_label').innerHTML = String(block_rate)+'\t' 
 }
 
 function update_flammability()
 {
-    slider = document.getElementById("fire_spread_rate")
-    flammability = slider.value
+    input = document.getElementById("flammability_input")
+    flammability = input.value
+    document.getElementById('flammability_label').innerHTML = String(flammability)+'\t'
+}
+
+function update_iterations()
+{
+    input = document.getElementById("iteration_input")
+    iterations = input.value
 }
 
 function shortestPathFrom(x,y,state=maze,avoidFire=false)
@@ -366,7 +374,7 @@ function generateValidMaze()
 {
     generate()
     tries = 0
-    limit = 9999
+    limit = 999
     while(!validMaze() && tries < limit)
     {
         tries++
@@ -437,6 +445,7 @@ function replan(agent)
 
 function simulationStep()
 {
+    //this only applies to manual stepping. a full simulation will end before the next iteration 
     if (!agent1.playing && !agent2.playing && !agent3.playing && !agent4.playing)
     {
         console.log("simulation completed",result)
@@ -531,20 +540,22 @@ function simulationStep()
     colorPath(agent4.path,"green")
 }
 
-function fullSimulation(iterations)
+function fullSimulation(repeat=iterations)
 {
     aggregate = {
         allFail:0,
         allSurvive:0,
-        agent1Wins:0,
-        agent2Wins:0,
-        agent3Wins:0,
-        agent4Wins:0,
+        agent1Survives:0,
+        agent2Survives:0,
+        agent3Survives:0,
+        agent4Survives:0,
+        omitted: 0
     }
-    for (var i = 0; i < iterations; i++)
+    for (var i = 0; i < repeat; i++)
     {
         if (!generateValidMaze())
         {
+            aggregate.omitted++
             continue;
         }
 
@@ -564,19 +575,19 @@ function fullSimulation(iterations)
         {
             if (result.agent1Escaped)
             {
-                aggregate.agent1Wins++
+                aggregate.agent1Survives++
             }
             if (result.agent2Escaped)
             {
-                aggregate.agent2Wins++
+                aggregate.agent2Survives++
             }
             if (result.agent3Escaped)
             {
-                aggregate.agent3Wins++
+                aggregate.agent3Survives++
             }
             if (result.agent4Escaped)
             {
-                aggregate.agent4Wins++
+                aggregate.agent4Survives++
             }
         }
     }
