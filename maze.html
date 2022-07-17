@@ -10,7 +10,7 @@
         </div>
         <div>
             <input type="button" onclick="generate()" value="Generate Random" id="generate_button">
-            <input type="range" id="block_rate_input" min="0" max="0.5" step="0.02" onclick="update_block_rate()">
+            <input type="range" id="block_rate_input" min="0" max="1" step="0.02" onclick="update_block_rate()">
             Density:
             <label id="block_rate_label">0.30</label>
         </div>
@@ -21,17 +21,11 @@
             <label id="valid_maze_label"></label>
         </div>
        <div>
-            <input type="button" onclick="spreadFire()" value="Step">
-            <input type="range" id="fire_spread_rate" min="0" max="1" step="0.02" onclick="update_flammability()">
+            <input type="button" onclick="simulationStep()" value="Step">
+            <input type="range" id="fire_spread_rate" min="0" max="1" step="0.02" value="0.2" onclick="update_flammability()">
        </div>
        <div>
-        <input type="button" onclick="agent3()" value="Test Agent 3">
-       </div>
-
-
-
-       <div>
-           <input type="button" onclick="clearAll()" value="Clear All">
+           <input type="button" onclick="clearAll()" value="Reset">
            <input type="button" onclick="display()" value="Clear Paths">
        </div>
        <div>

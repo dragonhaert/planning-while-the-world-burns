@@ -3,20 +3,68 @@ const center = Math.floor(size/2)
 const unreachable = size**2+1
 var block_rate = 0.3
 
+const table = document.getElementById("grid")
+const maze = new Array(size)
+const cells = new Array(size)
+
 const wallColor = "401500"
 const openColor = "FFFF80"
 const starColor = "gold"
 const fireColor = "red"
 
-
-const table = document.getElementById("grid")
-const maze = new Array(size)
-const cells = new Array(size)
-
-var fireField = []
-var flammability = 0.5
-
 var selected = []
+var time = 0
+var fireField = []
+var flammability = 0.2
+
+const agent1 = {
+    playing: true,
+    x: 0,
+    y: 0,
+    path: []
+}
+
+const agent2 = {
+    playing: true,
+    x: 0,
+    y: 0,
+    path: [],
+    foresight: 0
+}
+
+const agent3 = {
+    playing: true,
+    x: 0,
+    y: 0,
+    path: [],
+    foresight: 3
+}
+
+const agent4 = {
+    playing:true,
+    x: 0,
+    y: 0,
+    path: [],
+    foresight: 20
+}
+
+const dest = {
+    x:50,
+    y:50
+}
+
+var result = {
+    concluded: false,
+    agent1Escaped:false,
+    agent1distance:unreachable,
+    agent2Escaped:false,
+    agent2distance:unreachable,
+    agent3Escaped:false,
+    agent3distance:unreachable,
+    agent4Escaped:false,
+    agent4distance:unreachable
+}
+
 
 for (var i = 0; i < size; i++)
 {
@@ -34,8 +82,6 @@ for (var i = 0; i < size; i++)
 
 generate()
 display()
-
-
 
 function Point(x,y)
 {
@@ -67,26 +113,14 @@ function Point(x,y)
 
 function generate()
 {
-    for (var i = 0; i < size; i++)
-    {
-        for (var j = 0; j < size; j++)
-        {
-            maze[i][j].seed()
-            maze[i][j].onFire = false
-        }
-    }
-    maze[0][0].open = true
-    maze[0][size-1].open = true
-    maze[size-1][0].open = true
-    maze[size-1][size-1].open = true
-    maze[center][center].open = true
-    maze[center][center].onFire = true
-
-    fireField = [maze[center][center]]
-    selected = []
+    maze.forEach(row =>{
+        row.forEach(p => {
+            p.seed()
+        })
+    })
     
+    clearAll()
     validMaze()
-    display()
 }
 
 function display(state=maze)
@@ -99,6 +133,37 @@ function display(state=maze)
         }
     }
     cells[center][center].setAttribute("bgcolor",starColor)
+    cells[agent1.y][agent1.x].setAttribute("bgcolor",starColor)
+    cells[agent2.y][agent2.x].setAttribute("bgcolor",starColor)
+    cells[agent3.y][agent3.x].setAttribute("bgcolor",starColor)
+    cells[agent4.y][agent4.x].setAttribute("bgcolor",starColor)
+}
+
+function resetAgents()
+{
+    initialShortestPaths = shortestPathFrom(dest.x,dest.y)
+
+    agent1.x = 0
+    agent1.y = 0
+    agent1.playing = true
+    agent1.path = getPath(agent1.x,agent1.y,initialShortestPaths)
+    
+    agent2.x = 0
+    agent2.y = 0
+    agent2.foresight = 0
+    agent2.playing = true
+    agent2.path = getPath(agent2.x,agent2.y,initialShortestPaths)
+
+    agent3.x = 0
+    agent3.y = 0
+    agent3.playing = true
+    agent3.path = getPath(agent3.x,agent3.y,initialShortestPaths)
+    
+    agent4.x = 0
+    agent4.y = 0
+    agent4.foresight = 20
+    agent4.playing = true
+    agent4.path = getPath(agent4.x,agent4.y,initialShortestPaths)
 }
 
 function clearAll(){
@@ -107,9 +172,33 @@ function clearAll(){
             c.onFire = false
         })
     })
+    
+    
+    maze[0][0].open = true
+    maze[0][size-1].open = true
+    maze[size-1][0].open = true
+    maze[size-1][size-1].open = true
+    maze[center][center].open = true
     maze[center][center].onFire = true
     fireField = [maze[center][center]]
     selected = []
+
+
+    time = 0
+
+    resetAgents()
+    result = {
+        concluded: false,
+        agent1Escaped:false,
+        agent1distance:unreachable,
+        agent2Escaped:false,
+        agent2distance:unreachable,
+        agent3Escaped:false,
+        agent3distance:unreachable,
+        agent4Escaped:false,
+        agent4distance:unreachable
+    }
+
     display()
 }
 
@@ -172,9 +261,14 @@ function shortestPathFrom(x,y,state=maze,avoidFire=false)
     return dist
 }
 
-function colorPath(x,y,dist,color)
+function colorPathFromDist(x,y,dist,color)
 {
     path = getPath(x,y,dist)
+    colorPath(path, color)
+}
+
+function colorPath(path, color)
+{
     path.forEach(p => {
         cells[p.y][p.x].setAttribute("bgcolor",color)
     })
@@ -199,14 +293,14 @@ function select(event)
         end = selected.pop()
         start = selected.pop()
 
-        path = shortestPathFrom(end.x,end.y,maze,true)
+        dist = shortestPathFrom(end.x,end.y,maze,true)
 
-        if (path[start.y][start.x] != unreachable)
+        if (dist[start.y][start.x] != unreachable)
         {
             console.log("path found from",start.x,start.y,"to",end.x,end.y)
 
             customColor = document.getElementById("color_picker").value
-            colorPath(start.x,start.y,path,customColor)
+            colorPathFromDist(start.x,start.y,dist,customColor)
         }
         else
         {
@@ -240,29 +334,32 @@ function colorValid()
     c = shortestPathFrom(center,center)
     a = shortestPathFrom(0,0)
     
-    colorPath(0,0,c,"#e94971")
-    colorPath(size - 1,0,c,"#e9ae49")
-    colorPath(0,size - 1,c,"#7e49e9")
-    colorPath(size - 1,size - 1,c,"#b4e949")
-    colorPath(size - 1,size - 1,a,"#49e994")
+    colorPathFromDist(0,0,c,"#e94971")
+    colorPathFromDist(size - 1,0,c,"#e9ae49")
+    colorPathFromDist(0,size - 1,c,"#7e49e9")
+    colorPathFromDist(size - 1,size - 1,c,"#b4e949")
+    colorPathFromDist(size - 1,size - 1,a,"#49e994")
 }
 
 function getPath(x,y,dist,state=maze)
 {
-    if (dist[y][x] == unreachable)
+    if (dist[y][x] == unreachable || dist[y][x] == 0)
     {
         return []
     }
-    path = []
     p = state[y][x]
-    while (dist[p.y][p.x] != unreachable && dist[p.y][p.x])
+    path = [p]
+    while (dist[p.y][p.x] != unreachable/* && dist[p.y][p.x]*/)
     {
+        p = p.neighbors().sort((a,b) => dist[b.y][b.x]-dist[a.y][a.x]).pop()
+
         path.push(p)
-        p = p.neighbors()
-            .sort((a,b) => dist[b.y][b.x]-dist[a.y][a.x])
-            .pop()
-    }
-    return path
+        if (!dist[p.y][p.x])
+        {
+            path.shift()
+            return path
+        }
+    }   
 }
 
 function generateValidMaze()
@@ -279,76 +376,35 @@ function generateValidMaze()
 
 }
 
-function pathOnFire(path)
+function spreadFire(fire=fireField,state=maze)
 {
-    path.forEach(point => {
-        if (point.onFire)
-        {
-            return true
-        }
-    });
-    return false
-}
-
-function spreadFire()
-{
-    stage = fireField.filter(spark => spark.neighbors().filter(n => n.open && !n.onFire).length)
+    stage = fire.filter(spark => spark.neighbors(state).some(n => n.open && !n.onFire))
     toLight = []
-    safe = []
     stage.forEach(edge => {
-        edge.neighbors()
-        .filter(n => n.open && !n.onFire && toLight.indexOf(n) == -1)
+        edge.neighbors(state)
+        .filter(n => n.open && !n.onFire)
         .forEach(fringe => {
-            burningNeighbors = fringe.neighbors().filter(n => n.onFire).length
-            threshold = 1 - (1 - flammability)**burningNeighbors
-            if (Math.random() < threshold) 
+            if (toLight.indexOf(fringe) == -1)
             {
-                toLight.push(fringe)
-            }
-            else
-            {
-                safe.push(fringe)
-            }
-        })
-    });
-
-    toLight.forEach(kindle => {
-        kindle.onFire = true;
-        fireField.push(kindle)
-        cells[kindle.y][kindle.x].setAttribute("bgcolor",fireColor)
-    })
-}
-
-function agent3(x=0,y=0,dx=size-1,dy=size-1)
-{
-    function projectSpread(fire,state)
-    {
-        stage = projectedFire.filter(spark => spark.neighbors(state).filter(n => n.open && !n.onFire).length)
-        toLight = []
-        safe = []
-        stage.forEach(edge => {
-            edge.neighbors(state)
-            .filter(n => n.open && !n.onFire && toLight.indexOf(n) == -1)
-            .forEach(fringe => {
                 burningNeighbors = fringe.neighbors(state).filter(n => n.onFire).length
                 threshold = 1 - (1 - flammability)**burningNeighbors
                 if (Math.random() < threshold) 
                 {
                     toLight.push(fringe)
                 }
-                else
-                {
-                    safe.push(fringe)
-                }
-            })
-        });
-
-        toLight.forEach(kindle => {
-            kindle.onFire = true;
-            fire.push(kindle)
-            cells[kindle.y][kindle.x].setAttribute("bgcolor",fireColor)
+            }
         })
-    }
+    });
+
+    toLight.forEach(kindle => {
+        kindle.onFire = true;
+        fire.push(kindle)
+    })
+}
+
+function replan(agent)
+{
+    
     projectedState = new Array(size)
     projectedFire = []
 
@@ -367,13 +423,162 @@ function agent3(x=0,y=0,dx=size-1,dy=size-1)
         }
     }
 
-    projectSpread(projectedFire,projectedState)
-    projectSpread(projectedFire,projectedState)
-    projectSpread(projectedFire,projectedState)
+    for (var i = 0; i < agent.foresight; i++)
+    {
+        spreadFire(projectedFire,projectedState)
+    }
     
-    a = shortestPathFrom(dx,dy,projectedState,true)
+    a = shortestPathFrom(dest.x,dest.y,projectedState,true)
+
+    newpath = getPath(agent.x,agent.y,a,projectedState)
+    return newpath
+}
+
+
+function simulationStep()
+{
+    if (!agent1.playing && !agent2.playing && !agent3.playing && !agent4.playing)
+    {
+        console.log("simulation completed",result)
+        return
+    }
+    
+    spreadFire()
+    time++
+    
+    
+    if (agent1.playing && agent1.path.length)
+    {
+        next = agent1.path.shift()
+        agent1.x = next.x
+        agent1.y = next.y
+
+        if (!agent1.path.length || maze[agent1.y][agent1.x].onFire)
+        {
+            agent1.playing = false
+            result.agent1Escaped = !maze[agent1.y][agent1.x].onFire
+            result.agent1distance = agent1.path.length
+        }
+    }
+
+    if (agent2.playing && agent2.path.length)
+    { 
+        newplan = replan(agent2)
+        if (newplan.length)
+        {
+            agent2.path = newplan
+        }
+        
+        next = agent2.path.shift()
+        agent2.x = next.x
+        agent2.y = next.y
+
+
+        if (!agent2.path.length || maze[agent2.y][agent2.x].onFire)
+        {
+            agent2.playing = false
+            result.agent2Escaped = !maze[agent2.y][agent2.x].onFire
+            result.agent2distance = agent2.path.length
+        }
+    }
+
+    if (agent3.playing && agent3.path.length)
+    { 
+        newplan = replan(agent3)
+        if (newplan.length)
+        {
+            agent3.path = newplan
+        }
+        next = agent3.path.shift()
+        agent3.x = next.x
+        agent3.y = next.y
+
+        if (!agent3.path.length || maze[agent3.y][agent3.x].onFire)
+        {
+            agent3.playing = false
+            result.agent3Escaped = !maze[agent3.y][agent3.x].onFire
+            result.agent3distance = agent3.path.length
+        }
+    }
+    
+    if (agent4.playing && agent4.path.length)
+    { 
+        if (!time%(agent4.foresight/2) || agent4.path.some(point => point.onFire))
+        {
+            newplan = replan(agent4)
+            if (newplan.length)
+            {
+                agent4.path = newplan
+            }
+        }
+        
+        next = agent4.path.shift()
+        agent4.x = next.x
+        agent4.y = next.y
+
+        if (!agent4.path.length || maze[agent4.y][agent4.x].onFire)
+        {
+            agent4.playing = false
+            result.agent4Escaped = !maze[agent4.y][agent4.x].onFire
+            result.agent4distance = agent4.path.length
+        }
+    }
 
     display()
-    colorPath(0,0,a,"blue")
-    return getPath(x,y,a,projectedState)
+    colorPath(agent1.path,"blue")
+    colorPath(agent2.path,"orange")
+    colorPath(agent3.path,"purple")
+    colorPath(agent4.path,"green")
+}
+
+function fullSimulation(iterations)
+{
+    aggregate = {
+        allFail:0,
+        allSurvive:0,
+        agent1Wins:0,
+        agent2Wins:0,
+        agent3Wins:0,
+        agent4Wins:0,
+    }
+    for (var i = 0; i < iterations; i++)
+    {
+        if (!generateValidMaze())
+        {
+            continue;
+        }
+
+        while (!(result.concluded = !agent1.playing && !agent2.playing && !agent3.playing && !agent4.playing))
+        {
+            simulationStep()
+        }
+        if (result.agent1Escaped && result.agent2Escaped && result.agent3Escaped && result.agent4Escaped)
+        {
+            aggregate.allSurvive++
+        }
+        else if (!result.agent1Escaped && !result.agent2Escaped && !result.agent3Escaped && !result.agent4Escaped)
+        {
+            aggregate.allFail++
+        }
+        else
+        {
+            if (result.agent1Escaped)
+            {
+                aggregate.agent1Wins++
+            }
+            if (result.agent2Escaped)
+            {
+                aggregate.agent2Wins++
+            }
+            if (result.agent3Escaped)
+            {
+                aggregate.agent3Wins++
+            }
+            if (result.agent4Escaped)
+            {
+                aggregate.agent4Wins++
+            }
+        }
+    }
+    console.log(aggregate)
 }
