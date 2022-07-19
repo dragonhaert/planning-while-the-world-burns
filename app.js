@@ -207,14 +207,14 @@ function update_block_rate()
 {
     input = document.getElementById("block_rate_input")
     block_rate =  input.value
-    document.getElementById('block_rate_label').innerHTML = String(block_rate)+'\t' 
+    //document.getElementById('block_rate_label').innerHTML = String(block_rate)+'\t' 
 }
 
 function update_flammability()
 {
     input = document.getElementById("flammability_input")
     flammability = input.value
-    document.getElementById('flammability_label').innerHTML = String(flammability)+'\t'
+    //document.getElementById('flammability_label').innerHTML = String(flammability)+'\t'
 }
 
 function update_iterations()
@@ -332,7 +332,7 @@ function validMaze()
     
     valid = TL && BL && TR && BR && CC
 
-    document.getElementById("valid_maze_label").innerHTML = valid
+    document.getElementById("valid_maze_label").innerHTML = valid ? "True" : "False"
 
     return valid
 }
