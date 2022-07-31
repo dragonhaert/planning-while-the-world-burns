@@ -1,73 +1,89 @@
 <!doctype html>
 <html>
     <head>
-        <title>Maze</title>
+        <title>Planning While the World Burns</title>
         <link rel="icon" href="icon0.png">
     </head>
     <body>
-        <div>
-            
-        </div>
-
-        <table>
-            <tr>
-                <td colspan="3">
-                    <table id="grid"></table>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="button" onclick="generate()" value="Generate Random">
-                    <input type="button" onclick="generateValidMaze()" value="Generate Valid">
-                    <label id="valid_maze_label"></label>
-                </td>
-            </tr>
-            <tr>
-                <td> Density: </td>
-                <td>
-                    <input type="number" id="block_rate_input" min="0" max="1" step="0.02" value = 0.3 onchange="update_block_rate()">
-                </td>
-            </tr>
-            <tr>
-                <td> Q / Flammability: </td>
-                <td>
-                    <input type="number" id="flammability_input" min="0" max="1" step="0.02" value="0.2" onchange="update_flammability()">
-                </td>
-            </tr>
-            <tr>
-                <td> Iterations: </td>
-                <td>
-                    <input type="number" id="iteration_input" min="0" value="1" onchange="update_iterations()">
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="button" onclick="fullSimulation()" value="Simulate">   
-                    <input type="button" onclick="simulationStep()" value="Step">
-                    <input type="button" onclick="clearAll()" value="Reset">
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Custom Path Color:
-                </td>
-                <td>
-                    <input type="color" id="color_picker" value="#e94949">
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="button" onclick="colorValid()" value="Paint Valid">
-                    <input type="button" onclick="display()" value="Clear Paths">
-                </td>
-            </tr>
-        </table>
-        
-        <div class="horizontal">
-        <div>
-            
+        <div class="centered">
+            <h1>Planning While the World Burns</h1>          
         </div>
         <div>
+            <table id="grid"></table>
+            <table id = settings>
+                <tr>
+                    <td>
+                        Victor Okoye<br>
+                        CS 440 - Summer 2022
+                    </td>
+                </tr>
+                <tr><td colspan="2"><hr></td></tr>
+                <tr>
+                    <td> Density: </td>
+                    <td><input type="number" id="block_rate_input" min="0" max="1" step="0.02" value = 0.3 onchange="update_block_rate()"></td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="button" onclick="generate()" value="Generate Random">
+                        <input type="button" onclick="generateValidMaze()" value="Generate Valid">
+                    </td>
+                    <td><label id="valid_maze_label"></label></td>
+                </tr>
+                <tr><td colspan="2"><hr></td></tr>
+                <tr>
+                    <td> Custom Path Color: </td>
+                    <td>  <input type="color" id="color_picker" value="#e94949"> </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="button" onclick="colorValid()" value="Paint Valid">
+                        <input type="button" onclick="display()" value="Clear Paths">
+                    </td>
+                </tr>
+                <tr><td colspan="2"><hr></td></tr>
+                <tr>
+                    <td> Iterations: </td>
+                    <td> <input type="number" id="iteration_input" min="0" value="1" onchange="update_iterations()"> </td>
+                </tr>
+                <tr>
+                    <td> Q / Flammability: </td>
+                    <td> <input type="number" id="flammability_input" min="0" max="1" step="0.02" value="0.2" onchange="update_flammability()"> </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="button" onclick="fullSimulation()" value="Simulate">   
+                        <input type="button" onclick="simulationStep()" value="Step">
+                        <input type="button" onclick="clearAll()" value="Reset">
+                    </td>
+                </tr>
+                <tr><td colspan="2"><hr></td></tr>
+                <tr class="results">
+                    <td> 
+                        <input type="color" id="color1" value="#0000ff">
+                        Agent 1 Success Rate: <label id="agent1successrate"></label>
+                    </td>
+                </tr>
+                <tr class="results">
+                    <td> 
+                        <input type="color" id="color2" value="#ffa500">
+                        Agent 2 Success Rate: <label id="agent2successrate"></label>
+                    </td>
+                </tr>
+                <tr class="results">
+                    <td>
+                        <input type="color" id="color3" value="#008000">
+                        Agent 3 Success Rate: <label id="agent3successrate"></label>
+                    </td>
+                </tr>
+                <tr class="results">
+                    <td> 
+                        <input type="color" id="color4" value="#800080">
+                        Agent 4 Success Rate: <label id="agent4successrate"></label>
+                    </td>
+                </tr>
+                <tr><td colspan="2"><hr></td></tr>
+            </table>
+        </div>
             
     </body>
     <script src="app.js"></script>
@@ -76,14 +92,24 @@
 <style>
     body {
         padding: 1em;
+        max-width: fit-content;
+        margin:auto;
+        background-color: #303640;
+        color: aliceblue;
     }
     body > div{
-        margin-bottom: 5px;
+        margin: 1em;
     }
     table#grid{
-        border: 20px groove darkslategrey;
+        border: 20px ridge darkslategrey;
         background-color: darkgray;
         border-spacing: 0;
+        float: left;
+    }
+
+    table#settings {
+        padding: 1em;
+        background-color: black;
     }
     td.maze {
         width: 8px;
@@ -93,5 +119,27 @@
     input[type=number] {
         width: 4em;
     }
+
+    input[type=color] {
+        -webkit-appearance: none;
+        width: 2em;
+        padding:0;
+    }
+
+    input[type="color"]::-webkit-color-swatch-wrapper {
+        padding: 0;
+    }
+    
+    input[type="color"]::-webkit-color-swatch {
+        border: none;
+    }
+    
+    .centered {
+        text-align: center;
+    }
+
+    /*.results {
+        display:none
+    }*/
 
 </style>

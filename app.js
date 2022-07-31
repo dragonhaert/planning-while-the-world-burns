@@ -22,7 +22,8 @@ const agent1 = {
     playing: true,
     x: 0,
     y: 0,
-    path: []
+    path: [],
+    color: "blue"
 }
 
 const agent2 = {
@@ -30,6 +31,7 @@ const agent2 = {
     x: 0,
     y: 0,
     path: [],
+    color:"orange",
     foresight: 0
 }
 
@@ -38,6 +40,7 @@ const agent3 = {
     x: 0,
     y: 0,
     path: [],
+    color:"green",
     foresight: 3
 }
 
@@ -46,7 +49,8 @@ const agent4 = {
     x: 0,
     y: 0,
     path: [],
-    foresight: 20
+    color:"purple",
+    foresight: 0
 }
 
 const dest = {
@@ -138,6 +142,11 @@ function display(state=maze)
     cells[agent2.y][agent2.x].setAttribute("bgcolor",starColor)
     cells[agent3.y][agent3.x].setAttribute("bgcolor",starColor)
     cells[agent4.y][agent4.x].setAttribute("bgcolor",starColor)
+    
+    agent1.color = document.getElementById("color1").value
+    agent2.color = document.getElementById("color2").value
+    agent3.color = document.getElementById("color3").value
+    agent4.color = document.getElementById("color4").value
 }
 
 function resetAgents()
@@ -162,9 +171,9 @@ function resetAgents()
     
     agent4.x = 0
     agent4.y = 0
-    agent4.foresight = 20
     agent4.playing = true
     agent4.path = getPath(agent4.x,agent4.y,initialShortestPaths)
+    agent4.foresight = agent4.path.length/2
 }
 
 function clearAll(){
@@ -332,7 +341,7 @@ function validMaze()
     
     valid = TL && BL && TR && BR && CC
 
-    document.getElementById("valid_maze_label").innerHTML = valid ? "True" : "False"
+    document.getElementById("valid_maze_label").innerHTML = valid ? "Valid" : "Invalid"
 
     return valid
 }
@@ -511,19 +520,20 @@ function simulationStep()
     }
     
     if (agent4.playing && agent4.path.length)
-    { 
-        if (!time%(agent4.foresight/2) || agent4.path.some(point => point.onFire))
+    {
+        if (agent4.path.length%time)
         {
+            agent4.foresight = agent4.path.length/2
             newplan = replan(agent4)
             if (newplan.length)
             {
                 agent4.path = newplan
             }
         }
-        
         next = agent4.path.shift()
         agent4.x = next.x
         agent4.y = next.y
+
 
         if (!agent4.path.length || maze[agent4.y][agent4.x].onFire)
         {
@@ -534,10 +544,10 @@ function simulationStep()
     }
 
     display()
-    colorPath(agent1.path,"blue")
-    colorPath(agent2.path,"orange")
-    colorPath(agent3.path,"purple")
-    colorPath(agent4.path,"green")
+    colorPath(agent1.path,agent1.color)
+    colorPath(agent2.path,agent2.color)
+    colorPath(agent3.path,agent3.color)
+    colorPath(agent4.path,agent4.color)
 }
 
 function fullSimulation(repeat=iterations)
@@ -591,5 +601,12 @@ function fullSimulation(repeat=iterations)
             }
         }
     }
+
+    document.querySelectorAll('.results').forEach(row => row.style.setProperty("display","block"))
+    document.getElementById("agent1successrate").innerHTML = aggregate.agent1Survives / repeat
+    document.getElementById("agent2successrate").innerHTML = aggregate.agent2Survives / repeat
+    document.getElementById("agent3successrate").innerHTML = aggregate.agent3Survives / repeat
+    document.getElementById("agent4successrate").innerHTML = aggregate.agent4Survives / repeat
+
     console.log(aggregate)
 }
